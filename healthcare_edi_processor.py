@@ -1,6 +1,5 @@
-# healthcare_edi_processor.py
 import faker
-from tabulate import tabulate  # Install using: pip install tabulate
+from tabulate import tabulate
 
 def process_healthcare_edi_834(edi_data):
     # Parse EDI834 data
@@ -9,22 +8,32 @@ def process_healthcare_edi_834(edi_data):
     # Convert to readable format
     readable_data = convert_to_readable_format(parsed_data)
 
-    # Display data in a tabular format
-    print("Processed EDI834 data:")
-    print(tabulate(readable_data.items(), headers=["Field", "Value"], tablefmt="grid"))
+    return readable_data
 
 def generate_test_data_edi_834():
-    # Use Faker library to generate dynamic test data
     fake = faker.Faker()
 
-    # Example: Generate test data for a member enrollment
+    # Generate test data for a member enrollment
     test_data = {
-        'MemberID': fake.uuid4(),
-        'FirstName': fake.first_name(),
-        'LastName': fake.last_name(),
-        'DOB': fake.date_of_birth(minimum_age=18, maximum_age=65),
-        'PlanStartDate': fake.date_this_decade(),
-        # Add more fields as needed
+        'Subscriber': {
+            'MemberID': fake.uuid4(),
+            'FirstName': fake.first_name(),
+            'LastName': fake.last_name(),
+            'DOB': fake.date_of_birth(minimum_age=18, maximum_age=65),
+            'PlanStartDate': fake.date_this_decade(),
+            # Add more subscriber fields as needed
+        },
+        'Dependents': [
+            {
+                'MemberID': fake.uuid4(),
+                'FirstName': fake.first_name(),
+                'LastName': fake.last_name(),
+                'DOB': fake.date_of_birth(minimum_age=1, maximum_age=17),
+                # Add more dependent fields as needed
+            },
+            # Add more dependents as needed
+        ],
+        # Add more top-level fields as needed
     }
 
     return test_data
@@ -44,9 +53,17 @@ if __name__ == "__main__":
     edi_data = "EDI_834_CONTENT_HERE"
 
     # Process EDI data
-    process_healthcare_edi_834(edi_data)
+    processed_data = process_healthcare_edi_834(edi_data)
 
     # Generate dynamic test data
     test_data = generate_test_data_edi_834()
+
+    # Display Processed EDI834 data in a tabular format
+    processed_table = tabulate(processed_data.items(), headers=["Field", "Value"], tablefmt="grid")
+    print("\nProcessed EDI834 data:")
+    print(processed_table)
+
+    # Display Generated Test Data in a tabular format
+    test_data_table = tabulate(test_data.items(), headers=["Field", "Value"], tablefmt="grid")
     print("\nGenerated Test Data for EDI834:")
-    print(tabulate(test_data.items(), headers=["Field", "Value"], tablefmt="grid"))
+    print(test_data_table)
