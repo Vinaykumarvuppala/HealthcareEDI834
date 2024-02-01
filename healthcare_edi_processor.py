@@ -40,17 +40,30 @@ def generate_test_data_edi_834():
 
 def parse_edi_834(edi_data):
     # Implement EDI834 parsing logic (dummy logic for illustration)
-    parsed_data = {}  # Replace with actual parsing logic
+    parsed_data = {}
+
+    # For example, let's assume EDI834 data is in a key-value pair format separated by a delimiter ';'
+    key_value_pairs = edi_data.split(';')
+
+    for pair in key_value_pairs:
+        key, value = pair.split('=')
+        parsed_data[key.strip()] = value.strip()
+
     return parsed_data
 
 def convert_to_readable_format(parsed_data):
     # Implement logic to convert parsed data to a readable format (dummy logic for illustration)
-    readable_data = parsed_data  # Replace with actual conversion logic
+    readable_data = {}
+
+    # For simplicity, let's assume we want to capitalize keys and display them in a dictionary
+    for key, value in parsed_data.items():
+        readable_data[key.capitalize()] = value
+
     return readable_data
 
 if __name__ == "__main__":
     # Example EDI data
-    edi_data = "EDI_834_CONTENT_HERE"
+    edi_data = "MemberID=123;FirstName=John;LastName=Doe;DOB=1990-01-01;PlanStartDate=2024-01-01"
 
     # Process EDI data
     processed_data = process_healthcare_edi_834(edi_data)

@@ -15,7 +15,8 @@
     <script>
         async function fetchAndDisplayData() {
             try {
-                const response = await fetch('http://127.0.0.1:5000/get_healthcare_data');
+                // Use the correct URL for fetching data
+                const response = await fetch('https://healthcare-edi-834.vercel.app/get_healthcare_data');
                 const data = await response.json();
 
                 // Display the processed data
