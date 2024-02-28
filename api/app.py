@@ -19,6 +19,10 @@ def generate_random_patient_data(num_patients=5):
         }
         data.append(patient)
     return data
+# Define a route for the root URL
+@app.route('/')
+def index():
+    return 'Welcome to the Healthcare EDI Processor'
 
 @app.route('/get_healthcare_data', methods=['GET'])
 def get_healthcare_data():
