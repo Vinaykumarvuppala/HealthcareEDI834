@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/**/*.py": {
-      "runtime": "python3.9",
+      "runtime":"now-python@16.x",
       "memory": 1024
     }
   },
