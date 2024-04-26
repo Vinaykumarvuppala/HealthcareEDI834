@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # Generate dynamic test data
     test_data = generate_test_data_edi_834()
 
-    # Display Processed EDI834 data in a tabular format
+    # Display Processed EDI834 data in a tabular format--
     processed_table = tabulate(processed_data.items(), headers=["Field", "Value"], tablefmt="grid")
     print("\nProcessed EDI834 data:")
     print(processed_table)
