@@ -6,7 +6,13 @@ const labels={ISA:"Interchange control header",IEA:"Interchange control trailer"
 function parse(text){
 const clean=text.trim();if(!clean)throw Error("Enter or load synthetic EDI first.");
 let element="*",segment="~";
-if(clean.startsWith("ISA")&&clean.length>=106){element=clean[3];segment=clean[105];}
+if(clean.startsWith("ISA")) {
+  element=clean[3]||"*";
+  // Fixed-position ISA detection is reliable only for correctly padded ISA headers.
+  // Prefer an explicit tilde if present: educational test files often have short ISA fields.
+  if(clean.includes("~")) segment="~";
+  else if(clean.length>=106) segment=clean[105];
+}
 const parts=clean.split(segment).map(s=>s.trim()).filter(Boolean),rows=parts.map((s,i)=>({num:i+1,parts:s.split(element),raw:s}));
 let members=[],current=null,issues=[];
 for(const r of rows){const p=r.parts,tag=p[0];
