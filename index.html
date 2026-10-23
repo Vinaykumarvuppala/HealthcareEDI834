@@ -12,17 +12,21 @@ input,select{width:100%;padding:10px;border:1px solid #b8c9d8;border-radius:8px;
 <section class="panel wide"><h2>3. Enrollment and coverage</h2><div id="members"><p>Parsed subscribers and dependents appear here.</p></div></section>
 <section class="panel wide"><h2>4. Segment explorer</h2><div id="segments"><p>Click Parse & inspect to see raw segments and plain-English descriptions.</p></div></section>
 <section class="panel wide"><h2>5. Generate a synthetic Indiana Medicaid 834</h2>
-<p>Enter a fictional enrollment scenario to generate, inspect, and download an educational 834 file. Indiana IHCP MCE guide v6.8 (Oct 9, 2026) describes HHW, HIP, HCC, and PATH programs. The state sends each member as a subscriber (INS01=Y, INS02=18).</p>
+<p>Enter a fictional enrollment scenario to generate, inspect, and download an educational 834 file. Indiana IHCP MCE guide v6.8 (Oct 9, 2026) describes HHW, HIP, HCC, and PATH programs. The state sends each member as a subscriber (INS01=Y, INS02=18). Generic training mode allows linked dependents, but is not an Indiana-specific layout.</p>
 <div class="grid">
 <div><label for="program">Indiana program</label><select id="program"><option value="HHW">Hoosier Healthwise (HHW)</option><option value="HIP">Healthy Indiana Plan (HIP)</option><option value="HCC">Hoosier Care Connect (HCC)</option><option value="PATH">PathWays for Aging (PATH)</option></select></div>
 <div><label for="scenario">Scenario</label><select id="scenario"><option value="021">Add enrollment</option><option value="001">Change enrollment</option><option value="024">Terminate enrollment</option><option value="025">Reinstate (HIP example only)</option><option value="030">Audit / compare</option></select></div>
-<div><label for="syntheticId">Synthetic member ID</label><input id="syntheticId" value="TEST123456" maxlength="30"></div>
-<div><label for="syntheticName">Fictional member name</label><input id="syntheticName" value="Taylor Example" maxlength="60"></div>
+<div><label for="memberModel">Member structure</label><select id="memberModel"><option value="indiana">Indiana IHCP MCE — each member is subscriber</option><option value="generic">Generic X12 training — subscriber and dependents</option></select></div>
+<div><label for="product">Product / coverage type</label><select id="product"><option value="HLT">Health (HLT)</option><option value="DEN">Dental (DEN)</option><option value="VIS">Vision (VIS)</option><option value="HMO">HMO (training)</option></select></div>
+<div><label for="subscriberCount">Number of subscribers (1–100)</label><input id="subscriberCount" type="number" min="1" max="100" value="2" step="1"></div>
+<div><label for="dependentsCount">Dependents per subscriber (0–10)</label><input id="dependentsCount" type="number" min="0" max="10" value="1" step="1"></div>
+<div><label for="syntheticId">Synthetic member ID prefix</label><input id="syntheticId" value="TEST123456" maxlength="30"></div>
+<div><label for="syntheticName">Fictional name prefix</label><input id="syntheticName" value="Taylor Example" maxlength="60"></div>
 <div><label for="effectiveDate">Effective date</label><input id="effectiveDate" type="date" value="2026-11-01"></div>
-<div><label for="planCode">Fictional coverage plan code</label><input id="planCode" value="DEMO-PLAN" maxlength="30"></div>
+<div><label for="planCode">Plan / product identifier (fictional)</label><input id="planCode" value="DEMO-PLAN" maxlength="30"></div>
 </div>
 <div class="buttons"><button id="generate" type="button">Generate EDI 834</button><button id="download" type="button" class="alt">Download .edi</button></div>
 <div id="generatorNotice" class="issue" role="status">Only synthetic information. Not a certified payer submission or full X12 compliance validator.</div>
 <p class="hint">The generator provides illustrative 834 structure and common member/coverage loops. Production files require complete X12 TR3 validation, IHCP's program-specific companion-guide fields, official trading partner IDs and testing/approval. It intentionally uses fictional envelope and plan identifiers.</p>
 <p><a href="https://www.in.gov/medicaid/providers/files/834-mce-benefit-enrollment-and-maintenance-transaction.pdf" target="_blank" rel="noopener noreferrer">Read official Indiana IHCP 834 companion guide v6.8</a></p>
-</section></div></main><script src="edi-explorer-v2.js"></script><script src="edi-generator.js"></script></body></html>
+</section></div></main><script src="edi-explorer-v2.js"></script><script src="edi-generator-bulk.js"></script></body></html>
