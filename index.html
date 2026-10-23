@@ -1,33 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare EDI Processor</title>
-</head>
-<body>
-    <h1>Welcome to the Healthcare EDI Processor</h1>
-
-    <div id="ediOutput">
-        <!-- The fetched and processed data will be displayed here -->
-    </div>
-
-    <script>
-        async function fetchAndDisplayData() {
-            try {
-                // Use the correct URL for fetching data
-                const response = await fetch('https://healthcare-edi-834.vercel.app/get_healthcare_data');
-                const data = await response.json();
-
-                // Display the processed data
-                document.getElementById('ediOutput').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-            } catch (error) {
-                console.error('Error fetching or displaying data:', error);
-            }
-        }
-
-        // Call the function on page load
-        fetchAndDisplayData();
-    </script>
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Healthcare EDI 834 | Explorer</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f3f7fb;color:#152438}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1100px;margin:auto;padding:30px 18px}header{margin-bottom:24px}.tag{font-size:.75rem;color:#176c7e;font-weight:700;letter-spacing:.1em}h1{margin:5px 0}p{line-height:1.5;color:#536276}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{border:1px solid #d7e1ed;background:white;border-radius:14px;padding:20px}.wide{grid-column:1/-1}textarea{width:100%;font:13px/1.6 ui-monospace,monospace;min-height:210px;padding:12px;border:1px solid #b8c9d8;border-radius:9px}button{border:0;background:#17568d;color:white;padding:10px 15px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}button.alt{background:#eaf2f8;color:#17568d}button:focus-visible{outline:3px solid #f2bb50}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f6fa;padding:13px;border-radius:9px}table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;border-bottom:1px solid #e4eaf2;padding:10px;vertical-align:top}th{color:#4b6379}#status{font-weight:650;color:#17568d}.issue{padding:8px 10px;background:#fff5df;border-radius:8px;margin:5px 0}.hint{font-size:.82rem}.chip{display:inline-block;padding:4px 8px;border-radius:9px;background:#e7f5f1;color:#12624d;font-size:.8rem;margin-right:6px}input[type=file]{max-width:100%}@media(max-width:720px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
+</style></head><body><main class="wrap">
+<header><span class="tag">SYNTHETIC DATA DEMO</span><h1>Healthcare EDI 834 Explorer</h1><p>Learn how enrollment transactions are organized, inspect segments, and identify basic structural issues. Runs entirely in your browser with no backend upload.</p></header>
+<div class="grid">
+<section class="panel"><h2>1. Input enrollment transaction</h2><p class="hint">Use synthetic records only. Do not paste real member names, IDs, SSNs, birth dates or other PHI into this educational demo.</p>
+<textarea id="raw" aria-label="EDI 834 transaction"></textarea><div class="buttons"><button id="sample">Load synthetic example</button><button id="parse">Parse &amp; inspect</button><button id="clear" class="alt">Clear</button></div><label for="ediFile">Or load a local synthetic .edi/.txt file:</label> <input id="ediFile" type="file" accept=".edi,.txt,text/plain"><p class="hint">Files are read locally and not transmitted by this page.</p>
+</section><section class="panel"><h2>2. Results overview</h2><p id="status" role="status">Load the sample and click Parse & inspect.</p><div id="metrics"></div><h3>Checks and learning notes</h3><div id="issues"></div><p class="hint">Structural checks are educational heuristics, not full ASC X12 005010X220A1 compliance certification or payer-specific companion-guide validation.</p></section>
+<section class="panel wide"><h2>3. Enrollment and coverage</h2><div id="members"><p>Parsed subscribers and dependents appear here.</p></div></section>
+<section class="panel wide"><h2>4. Segment explorer</h2><div id="segments"><p>Click Parse & inspect to see raw segments and plain-English descriptions.</p></div></section>
+</div></main><script src="edi-explorer.js"></script></body></html>
