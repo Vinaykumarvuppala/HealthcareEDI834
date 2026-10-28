@@ -1,0 +1,2 @@
+"use strict";
+(function(){document.querySelectorAll("[data-goto-tab]").forEach(button=>button.addEventListener("click",()=>{location.hash=button.getAttribute("data-goto-tab");const tabs=document.getElementById("tabWorkspace");if(tabs)tabs.scrollIntoView({behavior:"smooth",block:"start"});}));})();
