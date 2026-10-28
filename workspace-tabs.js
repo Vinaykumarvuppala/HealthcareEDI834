@@ -2,7 +2,7 @@
 (function(){
  const $=id=>document.getElementById(id);
  const config=[
- {id:"state",title:"1. State Selection",sections:[]},
+ {id:"state",title:"1. Start & State",sections:["journey"]},
  {id:"generate",title:"2. Generate",sections:["edi-generator","qa-workbench"]},
  {id:"validate",title:"3. Validate",sections:["edi-reader","validation-results","member-results"],extra:["segments"]},
  {id:"compare",title:"4. Compare",sections:["edi-compare"]},
