@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Synthetic EDI834 ZIP -> Lambda -> Step Functions -> Glue Python Shell
+Parameters:
+  RawBucketName:
+    Type: String
+  StageBucketName:
+    Type: String
+  ArtifactBucketName:
+    Type: String
+Resources:
+  RawBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref RawBucketName
+      BucketEncryption: {ServerSideEncryptionConfiguration: [{ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}}]}
+  StageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref StageBucketName
+      BucketEncryption: {ServerSideEncryptionConfiguration: [{ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}}]}
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ArtifactBucketName
+      BucketEncryption: {ServerSideEncryptionConfiguration: [{ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}}]}
+  ExtractFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: extract.handler
+      Runtime: python3.12
+      Timeout: 60
+      MemorySize: 256
+      Environment:
+        Variables: {STAGE_BUCKET: !Ref StageBucket}
+      Policies:
+        - S3ReadPolicy: {BucketName: !Ref RawBucket}
+        - S3WritePolicy: {BucketName: !Ref StageBucket}
+  GlueRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement: [{Effect: Allow, Principal: {Service: glue.amazonaws.com}, Action: 'sts:AssumeRole'}]
+      ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole']
+      Policies:
+        - PolicyName: SyntheticBucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - {Effect: Allow, Action: ['s3:GetObject','s3:PutObject'], Resource: [!Sub '${StageBucket.Arn}/*', !Sub '${ArtifactBucket.Arn}/*']}
+              - {Effect: Allow, Action: ['s3:ListBucket'], Resource: [!GetAtt StageBucket.Arn, !GetAtt ArtifactBucket.Arn]}
+  ParseJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: !Sub '${AWS::StackName}-parse834'
+      Role: !GetAtt GlueRole.Arn
+      Command:
+        Name: pythonshell
+        PythonVersion: '3.9'
+        ScriptLocation: !Sub 's3://${ArtifactBucketName}/scripts/parse_834.py'
+      MaxCapacity: 0.0625
+      GlueVersion: '3.0'
+  StateRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement: [{Effect: Allow, Principal: {Service: states.amazonaws.com}, Action: 'sts:AssumeRole'}]
+      Policies:
+        - PolicyName: InvokeAndGlue
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - {Effect: Allow, Action: ['lambda:InvokeFunction'], Resource: !GetAtt ExtractFunction.Arn}
+              - {Effect: Allow, Action: ['glue:StartJobRun','glue:GetJobRun','glue:GetJobRuns','glue:BatchStopJobRun'], Resource: !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:job/${ParseJob}'}
+              - {Effect: Allow, Action: ['events:PutRule','events:PutTargets','events:DescribeRule'], Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForGlueJobRule'}
+  Pipeline:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      RoleArn: !GetAtt StateRole.Arn
+      DefinitionString: !Sub |
+        {
+          "StartAt": "Unpack",
+          "States": {
+            "Unpack": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {"FunctionName": "${ExtractFunction.Arn}", "Payload.$": "$"},
+              "OutputPath": "$.Payload",
+              "Next": "Parse"
+            },
+            "Parse": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "${ParseJob}",
+                "Arguments": {
+                  "--INPUT_BUCKET.$": "$.bucket",
+                  "--INPUT_KEY.$": "$.key",
+                  "--OUTPUT_BUCKET": "${StageBucketName}"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+Outputs:
+  PipelineArn: {Value: !Ref Pipeline}
+  RawBucket: {Value: !Ref RawBucket}
+  StageBucket: {Value: !Ref StageBucket}
+  ArtifactBucket: {Value: !Ref ArtifactBucket}
