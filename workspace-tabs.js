@@ -7,7 +7,7 @@
  {id:"validate",title:"3. Validate",sections:["edi-reader","validation-results","member-results"],extra:["segments"]},
  {id:"compare",title:"4. Compare",sections:["edi-compare"]},
  {id:"reconcile",title:"5. Reconcile",sections:["reconciliation"]},
- {id:"cloud",title:"6. Cloud ETL & AI",sections:["cloud-etl-lab","zip-practice","transform-code-lab"]}
+ {id:"cloud",title:"6. Cloud ETL & AI",sections:["cloud-etl-lab","zip-practice","transform-code-lab","aws-stage-playbook"]}
  ];
  const menu=$("tabButtons"),container=$("tabPanels"),tabs=new Map();
  for(const cfg of config){
